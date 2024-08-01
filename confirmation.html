@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .confirmation-container {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .actions {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <h1>Confirm Purchase</h1>
+        <p id="planDetails"></p>
+        <p id="balanceDetails"></p>
+        <div class="actions">
+            <button onclick="confirmPurchase()">Confirm</button>
+            <button onclick="goBack()">Top Up</button>
+        </div>
+    </div>
+
+    <script>
+        let plan = '';
+        let cost = 0;
+        let balance = 0;
+
+        function confirmPurchase() {
+            if (balance < cost) {
+                alert('Insufficient balance. Please top up.');
+                return;
+            }
+            balance -= cost;
+            savePlan(plan);
+            alert('Plan purchased successfully!');
+            window.location.href = `wallet.html?balance=${balance}`;
+        }
+
+        function savePlan(plan) {
+            let plans = JSON.parse(localStorage.getItem('plans')) || [];
+            plans.push(plan);
+            localStorage.setItem('plans', JSON.stringify(plans));
+        }
+
+        function goBack() {
+            window.location.href = `wallet.html?balance=${balance}`;
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            plan = urlParams.get('plan');
+            cost = parseFloat(urlParams.get('cost'));
+            balance = parseFloat(urlParams.get('balance'));
+
+            document.getElementById('planDetails').textContent = `Plan: ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan ($${cost})`;
+            document.getElementById('balanceDetails').textContent = `Current Balance: $${balance.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>

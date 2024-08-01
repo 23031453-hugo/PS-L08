@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Plans</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .plans-container {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background-color: #eaeaea;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="plans-container">
+        <h1>My Plans</h1>
+        <ul id="plansList"></ul>
+        <button onclick="goBack()">Go Back</button>
+    </div>
+
+    <script>
+        let balance = 0;
+
+        function goBack() {
+            window.location.href = `wallet.html?balance=${balance}`;
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            balance = parseFloat(urlParams.get('balance'));
+            const plans = JSON.parse(localStorage.getItem('plans')) || [];
+            const plansList = document.getElementById('plansList');
+
+            if (plans.length === 0) {
+                plansList.innerHTML = '<li>No plans purchased.</li>';
+            } else {
+                plans.forEach(plan => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`;
+                    plansList.appendChild(listItem);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Processing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            text-align: left;
+        }
+        input, textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        input[type="file"] {
+            padding: 3px;
+        }
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Process Payment</h1>
+        <form id="payment-form" onsubmit="processPayment(event)">
+            <label for="hospital-name">Hospital Name:</label>
+            <input type="text" id="hospital-name" name="hospital-name" required>
+
+            <label for="reason">Reason:</label>
+            <textarea id="reason" name="reason" rows="3" required></textarea>
+
+            <label for="cost">Cost:</label>
+            <input type="number" id="cost" name="cost" required>
+
+            <label for="receipt">Upload Receipt:</label>
+            <input type="file" id="receipt" name="receipt" accept="image/*" required>
+
+            <button type="submit">Submit Payment</button>
+        </form>
+    </div>
+
+    <script>
+        function processPayment(event) {
+            event.preventDefault();
+
+            const hospitalName = document.getElementById('hospital-name').value;
+            const reason = document.getElementById('reason').value;
+            const cost = parseFloat(document.getElementById('cost').value);
+            const receipt = document.getElementById('receipt').files[0];
+
+            if (!receipt) {
+                alert('Please upload a receipt.');
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let balance = parseFloat(urlParams.get('balance'));
+
+            if (cost > balance) {
+                alert('Insufficient balance to process the payment.');
+                return;
+            }
+
+            balance -= cost;
+
+            // Simulate form submission and redirect to wallet.html with updated balance
+            alert(`Payment submitted successfully! New balance: $${balance.toFixed(2)}`);
+            window.location.href = `wallet.html?balance=${balance}`;
+        }
+    </script>
+</body>
+</html>

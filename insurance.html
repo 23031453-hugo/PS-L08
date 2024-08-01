@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Claim Processing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        input, select, button, textarea {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Insurance Claim Processing</h1>
+        <form id="claim-form" onsubmit="submitClaim(event)">
+            <label for="injury-type">Injury Type:</label>
+            <select id="injury-type" name="injury-type" onchange="showSubcategories()">
+                <option value="">Select Injury Type</option>
+                <option value="physical">Physical Injuries</option>
+                <option value="psychological">Psychological Injuries</option>
+                <option value="chronic">Chronic and Long-Term Injuries</option>
+                <option value="catastrophic">Catastrophic Injuries</option>
+                <option value="occupational">Occupational Injuries</option>
+                <option value="fatal">Fatal Injuries</option>
+            </select>
+
+            <div id="physical-subcategories" class="hidden">
+                <label for="physical-subcategory">Subcategory:</label>
+                <select id="physical-subcategory" name="physical-subcategory">
+                    <option value="soft-tissue">Soft Tissue Injuries (up to $200)</option>
+                    <option value="fractures">Fractures (up to $300)</option>
+                    <option value="lacerations">Lacerations and Abrasions (up to $100)</option>
+                    <option value="burns">Burns (up to $700)</option>
+                    <option value="dislocations">Dislocations (up to $2000)</option>
+                    <option value="internal">Internal Injuries (up to $2500)</option>
+                    <option value="head">Head Injuries (up to $3000)</option>
+                </select>
+            </div>
+
+            <div id="psychological-subcategories" class="hidden">
+                <label for="psychological-subcategory">Subcategory:</label>
+                <select id="psychological-subcategory" name="psychological-subcategory">
+                    <option value="emotional-distress">Emotional Distress ($7000)</option>
+                    <option value="ptsd">Post-Traumatic Stress Disorder (PTSD) ($7000)</option>
+                </select>
+            </div>
+
+            <div id="chronic-subcategories" class="hidden">
+                <label for="chronic-subcategory">Subcategory:</label>
+                <select id="chronic-subcategory" name="chronic-subcategory">
+                    <option value="chronic-pain">Chronic Pain ($15000)</option>
+                    <option value="degenerative">Degenerative Conditions ($20000)</option>
+                    <option value="disabilities">Disabilities ($30000)</option>
+                </select>
+            </div>
+
+            <div id="catastrophic-subcategories" class="hidden">
+                <label for="catastrophic-subcategory">Subcategory:</label>
+                <select id="catastrophic-subcategory" name="catastrophic-subcategory">
+                    <option value="spinal-cord">Spinal Cord Injuries ($8000)</option>
+                    <option value="loss-of-limbs">Loss of Limbs ($150000)</option>
+                    <option value="severe-burns">Severe Burns ($15000)</option>
+                    <option value="vision-hearing-loss">Vision or Hearing Loss ($100000)</option>
+                </select>
+            </div>
+
+            <div id="occupational-subcategories" class="hidden">
+                <label for="occupational-subcategory">Subcategory:</label>
+                <select id="occupational-subcategory" name="occupational-subcategory">
+                    <option value="rsis">Repetitive Strain Injuries (RSIs) ($10000)</option>
+                    <option value="harmful-substances">Exposure to Harmful Substances ($15000)</option>
+                </select>
+            </div>
+
+            <div id="fatal-subcategories" class="hidden">
+                <label for="fatal-subcategory">Subcategory:</label>
+                <select id="fatal-subcategory" name="fatal-subcategory">
+                    <option value="wrongful-death">Wrongful Death ($1000000)</option>
+                </select>
+            </div>
+
+            <label for="tier-level">Tier Level of Premium:</label>
+            <select id="tier-level" name="tier-level" onchange="updateClaimAmounts()">
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+            </select>
+
+            <label for="description">Description of Injury:</label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe the injury..."></textarea>
+
+            <button type="submit">Submit Claim</button>
+            <p id="predicted-claim-amount">Predicted Claim Amount: $0</p>
+        </form>
+    </div>
+
+    <script>
+        const claimAmounts = {
+            "physical": {
+                "soft-tissue": 200,
+                "fractures": 300,
+                "lacerations": 100,
+                "burns": 700,
+                "dislocations": 2000,
+                "internal": 2500,
+                "head": 3000
+            },
+            "psychological": {
+                "emotional-distress": 7000,
+                "ptsd": 7000
+            },
+            "chronic": {
+                "chronic-pain": 15000,
+                "degenerative": 20000,
+                "disabilities": 30000
+            },
+            "catastrophic": {
+                "spinal-cord": 8000,
+                "loss-of-limbs": 150000,
+                "severe-burns": 15000,
+                "vision-hearing-loss": 100000
+            },
+            "occupational": {
+                "rsis": 10000,
+                "harmful-substances": 15000
+            },
+            "fatal": {
+                "wrongful-death": 1000000
+            }
+        };
+
+        function showSubcategories() {
+            const injuryType = document.getElementById('injury-type').value;
+            const subcategoryDivs = document.querySelectorAll('[id$="-subcategories"]');
+            subcategoryDivs.forEach(div => div.classList.add('hidden'));
+
+            if (injuryType) {
+                document.getElementById(`${injuryType}-subcategories`).classList.remove('hidden');
+            }
+            updateClaimAmounts();
+        }
+
+        function updateClaimAmounts() {
+            const tierLevel = document.getElementById('tier-level').value;
+            const injuryType = document.getElementById('injury-type').value;
+            const subcategorySelect = document.getElementById(`${injuryType}-subcategory`);
+            const subcategories = subcategorySelect ? subcategorySelect.options : [];
+
+            for (let i = 0; i < subcategories.length; i++) {
+                const subcategory = subcategories[i].value;
+                const baseAmount = claimAmounts[injuryType][subcategory];
+                let multiplier = 1;
+
+                if (tierLevel === 'standard') {
+                    multiplier = 2;
+                } else if (tierLevel === 'premium') {
+                    multiplier = 3;
+                }
+
+                const newAmount = baseAmount * multiplier;
+                subcategories[i].textContent = `${subcategory.replace(/-/g, ' ').charAt(0).toUpperCase() + subcategory.slice(1)} (up to $${newAmount.toLocaleString()})`;
+            }
+            updateClaimAmount();
+        }
+
+        function updateClaimAmount() {
+            const tierLevel = document.getElementById('tier-level').value;
+            const injuryType = document.getElementById('injury-type').value;
+            const subcategorySelect = document.getElementById(`${injuryType}-subcategory`);
+            const subcategory = subcategorySelect ? subcategorySelect.value : '';
+            const baseAmount = claimAmounts[injuryType] ? claimAmounts[injuryType][subcategory] : 0;
+            let multiplier = 1;
+
+            if (tierLevel === 'standard') {
+                multiplier = 2;
+            } else if (tierLevel === 'premium') {
+                multiplier = 3;
+            }
+
+            const newAmount = baseAmount * multiplier;
+            document.getElementById('predicted-claim-amount').textContent = `Predicted Claim Amount: $${newAmount.toLocaleString()}`;
+        }
+
+        function submitClaim(event) {
+            event.preventDefault();
+            const tierLevel = document.getElementById('tier-level').value;
+            const injuryType = document.getElementById('injury-type').value;
+            const subcategorySelect = document.getElementById(`${injuryType}-subcategory`);
+            const subcategory = subcategorySelect ? subcategorySelect.value : '';
+            const baseAmount = claimAmounts[injuryType] ? claimAmounts[injuryType][subcategory] : 0;
+            let multiplier = 1;
+
+            if (tierLevel === 'standard') {
+                multiplier = 2;
+            } else if (tierLevel === 'premium') {
+                multiplier = 3;
+            }
+
+            const claimAmount = baseAmount * multiplier;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let balance = parseFloat(urlParams.get('balance'));
+            balance += claimAmount;
+
+            alert(`Claim submitted successfully! Amount: $${claimAmount.toLocaleString()}`);
+            window.location.href = `wallet.html?balance=${balance}`;
+        }
+
+        document.getElementById('injury-type').addEventListener('change', showSubcategories);
+        document.getElementById('tier-level').addEventListener('change', updateClaimAmounts);
+    </script>
+</body>
+</html>
